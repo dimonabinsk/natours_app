@@ -1,0 +1,5 @@
+node_modules
+.eslintrc.json
+.prettierrc
+*.env
+./dev-data/init-db.js
