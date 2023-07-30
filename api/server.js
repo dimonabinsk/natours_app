@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 
 const app = require('./app');
 
+
 mongoose
   .connect(process.env.DATABASE, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
     user: process.env.USERNAME,
     pass: process.env.PASSWORD,
     dbName: 'natours',

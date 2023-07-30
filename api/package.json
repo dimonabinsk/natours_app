@@ -2,7 +2,7 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "NODE_ENV=production node server.js"
@@ -16,14 +16,14 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "eslint": "^8.44.0",
+    "eslint": "^8.46.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-config-prettier": "^8.9.0",
+    "eslint-plugin-import": "^2.28.0",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.1",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.0"
   }
