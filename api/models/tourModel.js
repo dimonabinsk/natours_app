@@ -54,7 +54,7 @@ const tourSchema = new mongoose.Schema({
     // скрываем поле при выдаче запроса пользователю,
     // полезно если нужно скрыть какую-нибудь
     // информацию(например password)
-    select: false,
+    // select: false,
   },
 });
 

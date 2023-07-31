@@ -20,9 +20,10 @@ exports.getAllTours = async (req, res) => {
       const sortBy = req.query.sort.split(',').join(' ');
       // console.log(sortBy);
       query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
     }
+    // else {
+    //   query = query.sort('-createdAt');
+    // }
 
     // 4) Ограничение выдаваемых полей запроса
     if (req.query.fields) {
@@ -30,6 +31,17 @@ exports.getAllTours = async (req, res) => {
       query = query.select(fieldsLimit);
     } else {
       query = query.select('-__v');
+    }
+
+    // 5) Пагинация
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const countTour = await Tour.countDocuments();
+      if (skip >= countTour) throw new Error('This page does not exist');
     }
 
     const tours = await query;
