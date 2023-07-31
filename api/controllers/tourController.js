@@ -2,7 +2,6 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-
     const queryObj = { ...req.query };
 
     // 1) фильтрация простая
@@ -23,6 +22,14 @@ exports.getAllTours = async (req, res) => {
       query = query.sort(sortBy);
     } else {
       query = query.sort('-createdAt');
+    }
+
+    // 4) Ограничение выдаваемых полей запроса
+    if (req.query.fields) {
+      const fieldsLimit = req.query.fields.split(',').join(' ');
+      query = query.select(fieldsLimit);
+    } else {
+      query = query.select('-__v');
     }
 
     const tours = await query;

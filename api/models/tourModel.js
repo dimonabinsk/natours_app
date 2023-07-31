@@ -51,6 +51,10 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    // скрываем поле при выдаче запроса пользователю,
+    // полезно если нужно скрыть какую-нибудь
+    // информацию(например password)
+    select: false,
   },
 });
 
