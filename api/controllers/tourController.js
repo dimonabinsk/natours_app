@@ -1,5 +1,14 @@
 const Tour = require('../models/tourModel');
 
+
+// промежуточное по
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,difficulty,summary';
+  next();
+}
+
 exports.getAllTours = async (req, res) => {
   try {
     const queryObj = { ...req.query };
@@ -20,10 +29,10 @@ exports.getAllTours = async (req, res) => {
       const sortBy = req.query.sort.split(',').join(' ');
       // console.log(sortBy);
       query = query.sort(sortBy);
+    } else {
+      // сортировка по умолчанию
+      query = query.sort('-createdAt');
     }
-    // else {
-    //   query = query.sort('-createdAt');
-    // }
 
     // 4) Ограничение выдаваемых полей запроса
     if (req.query.fields) {
