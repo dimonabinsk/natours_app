@@ -1,5 +1,3 @@
-const { models } = require('mongoose');
-
 class APIFeatures {
   constructor(query, queryString) {
     this.query = query;
@@ -32,7 +30,6 @@ class APIFeatures {
       // сортировка по умолчанию
       this.query = this.query.sort('-createdAt');
     }
-
     return this;
   }
 

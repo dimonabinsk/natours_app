@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const app = require('./app');
 
-
 mongoose
   .connect(process.env.DATABASE, {
     useUnifiedTopology: true,
@@ -14,7 +13,6 @@ mongoose
   .then(() => {
     console.log('DB connection successful... 💯');
   });
-
 
 app.listen(process.env.PORT, () => {
   console.log(`Приложение работает на порте: ${process.env.PORT}...`);
