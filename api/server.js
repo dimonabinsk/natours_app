@@ -23,6 +23,6 @@ if (process.env.DATABASE) {
 }
 if (process.env.PORT) {
   app.listen(process.env.PORT, () => {
-    console.log(`Приложение работает на порте: ${process.env.PORT}...`);
+    console.log(`Приложение запущено на порте: ${process.env.PORT}...`);
   });
 }

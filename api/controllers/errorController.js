@@ -1,3 +1,24 @@
+const AppError = require('../utils/appError');
+
+const handleCastErrorDB = (err) => {
+  const message = `Неверное значение ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
+};
+
+const handleDuplicateFieldDB = (err) => {
+  const message = `Дубликат значения поля ${Object.keys(err.keyValue)}:'${
+    err.keyValue.name
+  }'.Измените значение поля: '${Object.keys(err.keyValue)}'!`;
+  return new AppError(message, 400);
+};
+
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((el) => el.message);
+  console.log(errors);
+  const message = `Ввели неверные данные. ${errors.join('. ').trim()}`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -31,8 +52,13 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProd(err, res);
-  }
+    let error = JSON.parse(JSON.stringify(err));
+    console.log('Error: ', error);
+    if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldDB(error);
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
 
-  next();
+    sendErrorProd(error, res);
+  }
 };
