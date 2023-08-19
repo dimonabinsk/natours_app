@@ -20,7 +20,7 @@ if (process.env.DATABASE) {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       user: process.env.USERNAME,
-      pass: '12345',
+      pass: process.env.PASSWORD,
       dbName: 'natours',
     })
     .then(() => {

@@ -11,7 +11,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxLength: [40, 'Длина имени не должна превышать 40 символов'],
       minLength: [10, 'Длина имени не должна быть меньше 10 символов'],
-      // validate: [isAlpha, 'Имя tour должно сдержать только буквы'],
+      // validate: [isAlpha, 'Имя tour должно содержать только буквы'],
     },
     slug: String,
     duration: {
