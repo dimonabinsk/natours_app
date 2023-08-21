@@ -49,6 +49,8 @@ services:
       DATABASE: mongodb://mongo:27017/
       USERNAME: dimon
       PASSWORD: "12345"
+      JWT_SECRET: "this-super-secret-string-naturs-app"
+      JWT_EXPIRES_IN: "90d"
     depends_on:
       - mongo
       - mongo-express

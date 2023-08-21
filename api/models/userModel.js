@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 // function validatorEmail (value) {
 //         return value.match(
@@ -37,8 +38,26 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'Пожалуйста, повторите пароль'],
+    validate: {
+      validator: function (pass) {
+        // работает только при создании и сохранении
+        return pass === this.password;
+      },
+      message: 'Пароли не совпадают',
+    },
     trim: true,
   },
+});
+
+userSchema.pre('save', async function (next) {
+  // Эта функция запускается если пароль был фактически модифицирован
+  if (!this.isModified('password')) return next();
+
+  // Хэшируем пароль стоимостью 12
+  this.password = await bcrypt.hash(this.password, 12);
+  // Удаляем пароль в поле passwordConfirm
+  this.passwordConfirm = undefined;
+  next();
 });
 
 const User = mongoose.model('User', userSchema);
