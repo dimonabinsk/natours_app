@@ -3,3 +3,4 @@ mongodb/*
 .DS_Store
 *.env
 .vscode
+docker-compose.yml
