@@ -14,9 +14,19 @@ const handleDuplicateFieldDB = (err) => {
 
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
-  console.log(errors);
+  // console.log(errors);
   const message = `Ввели неверные данные. ${errors.join('. ').trim()}`;
   return new AppError(message, 400);
+};
+
+const handleJWTError = () => {
+  return new AppError('Не валидный токен! Попробуйте войти ещё раз!', 401);
+};
+const handleJWTExpiredError = () => {
+  return new AppError(
+    'Срок действия Вашего токена истёк! Пожалуйста авторизуйтесь заново!',
+    401,
+  );
 };
 
 const sendErrorDev = (err, res) => {
@@ -58,7 +68,8 @@ module.exports = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateFieldDB(error);
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
-
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
+    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
     sendErrorProd(error, res);
   }
 };
