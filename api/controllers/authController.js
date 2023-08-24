@@ -11,15 +11,23 @@ const signToken = (userId) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm, photo, passwordChangedAt } =
-    req.body;
+  const {
+    name,
+    email,
+    password,
+    passwordConfirm,
+    photo,
+    passwordChangedAt,
+    role,
+  } = req.body;
   const newUser = await User.create({
-    name: name,
-    email: email,
-    password: password,
-    passwordConfirm: passwordConfirm,
-    photo: photo,
-    passwordChangedAt: passwordChangedAt,
+    name,
+    email,
+    password,
+    passwordConfirm,
+    photo,
+    passwordChangedAt,
+    role,
   });
 
   const token = signToken(newUser._id);
@@ -111,3 +119,14 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('У Вас нет разрешения на выполнение этого действия', 403),
+      );
+    }
+    next();
+  };
+};
