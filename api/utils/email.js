@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
   });
   // 2) Определить параметры почты
   const emailOptions = {
-    from: '<dimonabinsk@yandex.ru>',
+    from: '"Natours app" <dimonabinsk@yandex.ru>',
     to: options.email,
     subject: options.subject,
     text: options.message,

@@ -59,6 +59,17 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  // Устанавливаем время смены пароля
+  // Из-за разницы в скорости работы базы данных и получения токена от API,
+  // то от времени отнимаем 1 секунду на всякий случай,
+  // чтобы получать токен после смены пароля
+  this.passwordChangedAt = Date.now() - 1000;
+
+  next();
+});
+
 userSchema.pre('save', async function (next) {
   // Эта функция запускается если пароль был фактически модифицирован
   if (!this.isModified('password')) return next();
@@ -97,7 +108,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.passwordResetToken);
+  console.log({ resetToken }, `passwordResetToken:${this.passwordResetToken}`);
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
