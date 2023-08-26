@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
 
 const signToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -130,3 +131,57 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Получить пользователя на основе его электронной почты (email)
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(
+      new AppError('Пользователя с таким адресом почты не существует', 404),
+    );
+  }
+  console.log(user);
+
+  // 2) Сгенерировать случайный токен
+  const resetToken = user.createPasswordResetToken();
+  user.save({
+    validateBeforeSave: false,
+  });
+
+  // 3) Отправить токен на почту пользователя
+
+  const resetURL = `${req.protocol}://${req.get(
+    'host',
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Забыли свой пароль? Отправьте запрос на исправление с вашим новым паролем и подтверждением пароля по адресу: ${resetURL}.\nЕсли вы не забыли свой пароль, пожалуйста, проигнорируйте это письмо!`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Токен сброса вашего пароля (действителен в течение 10 минут)',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Токен отправлен на электронную почту!',
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'Произошла ошибка при отправке электронного письма. Попробуйте еще раз позже!',
+      ),
+      500,
+    );
+  }
+
+  // next();
+});
+
+exports.resetPassword = (req, res, next) => {};
