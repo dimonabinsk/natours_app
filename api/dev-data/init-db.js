@@ -1,9 +1,9 @@
+const fs = require('fs');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: '../config.env' });
+dotenv.config({ path: '../../config.env' });
 const mongoose = require('mongoose');
 
-const fs = require('fs');
 
 const Tour = require('../models/tourModel');
 
@@ -12,9 +12,9 @@ const tours = JSON.parse(
 );
 
 mongoose
-  .connect(process.env.DATABASE || 'mongodb://localhost:27017/', {
-    user: process.env.USERNAME || 'dimon',
-    pass: process.env.PASSWORD || '12345',
+  .connect(process.env.DATABASE, {
+    user: process.env.USERNAME,
+    pass: process.env.PASSWORD,
     dbName: 'natours',
   })
   .then(() => {

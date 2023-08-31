@@ -1,32 +1,32 @@
 version: '3.9'
 
 services:
-  mongo:
-    image: mongo:7.0-rc-jammy
-    container_name: mongodb
-    restart: always
-    env_file:
-      - mongo.env
-    ports:
-      - 27017:27017
-    volumes:
-      - ./mongodb/mongodb_data:/data/db
-      - ./mongodb/mongodb_config:/data/configdb
-    networks:
-      - node-network
+  # mongo:
+  #   image: mongo:7.0-rc-jammy
+  #   container_name: mongodb
+  #   restart: always
+  #   env_file:
+  #     - mongo.env
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - ./mongodb/mongodb_data:/data/db
+  #     - ./mongodb/mongodb_config:/data/configdb
+  #   networks:
+  #     - node-network
 
-  mongo-express:
-    image: mongo-express
-    container_name: mongo_express
-    restart: always
-    env_file:
-      - mongo-express.env
-    ports:
-      - 8081:8081
-    depends_on:
-      - mongo
-    networks:
-      - node-network
+  # mongo-express:
+  #   image: mongo-express
+  #   container_name: mongo_express
+  #   restart: always
+  #   env_file:
+  #     - mongo-express.env
+  #   ports:
+  #     - 8081:8081
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - node-network
 
   natours-app:
     build: ./api
@@ -38,9 +38,9 @@ services:
       - 8080:8080
     volumes:
       - ./api/:/usr/src/app
-    depends_on:
-      - mongo
-      - mongo-express
+    # depends_on:
+    #   - mongo
+    #   - mongo-express
     networks:
       - node-network
 
