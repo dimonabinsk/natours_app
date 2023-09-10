@@ -1,19 +1,19 @@
 version: '3.9'
 
 services:
-  # mongo:
-  #   image: mongo:7.0-rc-jammy
-  #   container_name: mongodb
-  #   restart: always
-  #   env_file:
-  #     - mongo.env
-  #   ports:
-  #     - 27017:27017
-  #   volumes:
-  #     - ./mongodb/mongodb_data:/data/db
-  #     - ./mongodb/mongodb_config:/data/configdb
-  #   networks:
-  #     - node-network
+  mongo:
+    image: mongo:7.0-rc-jammy
+    container_name: mongodb
+    restart: always
+    env_file:
+      - mongo.env
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb/mongodb_data:/data/db
+      - ./mongodb/mongodb_config:/data/configdb
+    networks:
+      - node-network
 
   # mongo-express:
   #   image: mongo-express
@@ -38,8 +38,8 @@ services:
       - 8080:8080
     volumes:
       - ./api/:/usr/src/app
-    # depends_on:
-    #   - mongo
+    depends_on:
+      - mongo
     #   - mongo-express
     networks:
       - node-network

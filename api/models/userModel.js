@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', function (next) {
@@ -67,6 +72,13 @@ userSchema.pre('save', function (next) {
   // чтобы получать токен после смены пароля
   this.passwordChangedAt = Date.now() - 1000;
 
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // перед любым запросом find** отображаем
+  //пользователей с активной учёной записью(не удалённой им)
+  this.find({ active: { $ne: false } });
   next();
 });
 

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
+const { rateLimit } = require('express-rate-limit');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -12,6 +13,31 @@ const signToken = (userId) => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    ),
+    secure: false,
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+  // отправляем cookie браузеру
+  res.cookie('jwt', token, cookieOptions);
+
+  // удаляем пароль при отправке на клиент
+  user.password = undefined;
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: { user },
+  });
+};
+
+// Регистрация пользователя
 exports.signup = catchAsync(async (req, res, next) => {
   const {
     name,
@@ -32,15 +58,10 @@ exports.signup = catchAsync(async (req, res, next) => {
     role,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: { user: newUser },
-  });
+  createSendToken(newUser, 201, res);
 });
 
+// Авторизация пользователя
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -63,15 +84,20 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) если всё корректно отправить token на клиент
-
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
+// Ограничение на каждый IP-адрес до 10 запросов на  вход в приложение
+exports.loginAccountLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 час
+  max: 10,
+  message:
+    'Слишком много попыток входа с этого IP, пожалуйста, повторите попытку позже',
+  standardHeaders: 'draft-7', // draft-6: заголовки RateLimit-*; draft-7: заголовок комбинированного ограничения скорости
+  legacyHeaders: false, // X-RateLimit-* заголовки
+});
+
+// Проверка на то,что пользователь авторизован
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Проверить есть ли токен
   let token = null;
@@ -133,6 +159,7 @@ exports.restrictTo = (...roles) => {
   };
 };
 
+// Забыл пароль?
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Получить пользователя на основе его электронной почты (email)
   const user = await User.findOne({ email: req.body.email });
@@ -142,7 +169,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       new AppError('Пользователя с таким адресом почты не существует', 404),
     );
   }
-  console.log(user);
+  // console.log(user);
 
   // 2) Сгенерировать случайный токен
   const resetToken = user.createPasswordResetToken();
@@ -185,6 +212,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // next();
 });
 
+// Смена пароля
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Получаем пользователя на основе токена
   const hashedToken = crypto
@@ -212,10 +240,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 3) Изменяем changedPasswordAt для текущего пользователя
   // 4) Входим в систему, отправляем на клиент JWT
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+// Смена пароля по желанию пользователя
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) получаем пользователя из коллекции
+  const user = await User.findById(req.user.id).select('+password');
+  // 2) проверяем корректность введённого текущего пароля
+  const correctPassword = await user.correctPassword(
+    req.body.passwordCurrent,
+    user.password,
+  );
+  if (!correctPassword) {
+    return next(new AppError('Ваш текущий пароль не верен', 401));
+  }
+  // 3) если пароль верный, то обновляем его
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // 4) опять авторизуем пользователя и отправляем новый JWT на клиент
+  createSendToken(user, 200, res);
 });
