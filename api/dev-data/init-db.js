@@ -7,9 +7,7 @@ const mongoose = require('mongoose');
 
 const Tour = require('../models/tourModel');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/data/tours-simple.json`),
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/data/tours.json`));
 
 mongoose
   .connect(process.env.DATABASE, {
