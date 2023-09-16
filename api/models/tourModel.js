@@ -101,6 +101,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+    // reviews: [
+    //   {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Review',
+    //   },
+    // ],
     guides: [
       {
         type: mongoose.Schema.ObjectId,
@@ -125,6 +131,14 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
+
+//  Виртуальное заселение
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 // будет работать перед методами '.save' и '.create'
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
