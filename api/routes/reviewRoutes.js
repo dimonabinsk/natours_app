@@ -5,7 +5,7 @@ const {
 } = require('../controllers/reviewController');
 const { protect, restrictTo } = require('../controllers/authController');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true }); // mergeParams доступ к параметрам из другого маршрута
 
 router
   .route('/')
