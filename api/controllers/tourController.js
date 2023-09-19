@@ -2,6 +2,7 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 // промежуточное по
 exports.aliasTopTours = (req, res, next) => {
@@ -60,16 +61,18 @@ exports.updateTourId = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteTourId = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
+exports.deleteTourId = factory.deleteOne(Tour);
 
-  if (!tour) return next(new AppError('Tour с таким ID не найден', 404));
+// exports.deleteTourId = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
 
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+//   if (!tour) return next(new AppError('Tour с таким ID не найден', 404));
+
+//   res.status(204).json({
+//     status: 'success',
+//     data: null,
+//   });
+// });
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([

@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 const filterObj = (obj, ...allowFields) => {
   const newObj = {};
@@ -59,7 +60,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-// удаление пользователя из базы самим пользователем
+// удаление пользователя самим пользователем, не полностью из базы
 // (меняем учётную запись на не активную, давая возможность её восстановить)
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
@@ -77,9 +78,5 @@ exports.updateUserId = (req, res) => {
   });
 };
 
-exports.deleteUserId = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!',
-  });
-};
+// полное удаление пользователя из базы данных (доступно только админу)
+exports.deleteUserId = factory.deleteOne(User);
