@@ -71,12 +71,8 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateUserId = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!',
-  });
-};
+// не для обновления ПАРОЛЯ!!!! (доступно только админу)
+exports.updateUserId = factory.updateOne(User);
 
 // полное удаление пользователя из базы данных (доступно только админу)
 exports.deleteUserId = factory.deleteOne(User);

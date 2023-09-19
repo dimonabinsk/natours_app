@@ -38,28 +38,31 @@ exports.getTourId = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
+exports.createTour = factory.createOne(Tour);
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const newTour = await Tour.create(req.body);
 
-  res.status(201).json({
-    status: 'success',
-    data: { tour: newTour },
-  });
-});
+//   res.status(201).json({
+//     status: 'success',
+//     data: { tour: newTour },
+//   });
+// });
 
-exports.updateTourId = catchAsync(async (req, res, next) => {
-  const updateTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!updateTour) return next(new AppError('Tour с таким ID не найден', 404));
-  res.json({
-    status: 'success',
-    data: {
-      tour: updateTour,
-    },
-  });
-});
+exports.updateTourId = factory.updateOne(Tour);
+
+// exports.updateTourId = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   });
+//   if (!updateTour) return next(new AppError('Tour с таким ID не найден', 404));
+//   res.json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+// });
 
 exports.deleteTourId = factory.deleteOne(Tour);
 
