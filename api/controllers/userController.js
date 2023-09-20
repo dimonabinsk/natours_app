@@ -11,29 +11,15 @@ const filterObj = (obj, ...allowFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    message: 'success',
-    results: users.length,
-    data: { users },
-  });
-});
-
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This route is not yet defined!',
-  });
-};
-exports.getUserId = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!',
+    message:
+      'Этот маршрут не определен! Пожалуйста, используйте вместо этого /signup!',
   });
 };
 
+// обновление данных пользователя: пароль и почта
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) создаём ошибку если пользователь пытается изменить пароль
   if (req.body.password || req.body.passwordConfirm) {
@@ -71,8 +57,21 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getAllUsers = factory.getAll(User);
+exports.getUserId = factory.getOne(User);
+
 // не для обновления ПАРОЛЯ!!!! (доступно только админу)
 exports.updateUserId = factory.updateOne(User);
 
 // полное удаление пользователя из базы данных (доступно только админу)
 exports.deleteUserId = factory.deleteOne(User);
+
+// exports.getAllUsers = catchAsync(async (req, res, next) => {
+//   const users = await User.find();
+
+//   res.status(200).json({
+//     message: 'success',
+//     results: users.length,
+//     data: { users },
+//   });
+// });

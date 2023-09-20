@@ -1,7 +1,7 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
+// const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 // промежуточное по
@@ -12,31 +12,34 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+exports.getAllTours = factory.getAll(Tour);
 
-  const tours = await features.query;
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   const features = new APIFeatures(Tour.find(), req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
 
-  res.status(200).json({
-    message: 'success',
-    results: tours.length,
-    data: { tours },
-  });
-});
+//   const tours = await features.query;
 
-exports.getTourId = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-  if (!tour) return next(new AppError('Tour с таким ID не найден', 404));
+//   res.status(200).json({
+//     message: 'success',
+//     results: tours.length,
+//     data: { tours },
+//   });
+// });
 
-  res.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-});
+exports.getTourId = factory.getOne(Tour, { path: 'reviews' });
+// exports.getTourId = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findById(req.params.id).populate('reviews');
+//   if (!tour) return next(new AppError('Tour с таким ID не найден', 404));
+
+//   res.status(200).json({
+//     status: 'success',
+//     data: { tour },
+//   });
+// });
 
 exports.createTour = factory.createOne(Tour);
 // exports.createTour = catchAsync(async (req, res, next) => {
