@@ -57,6 +57,12 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+// конечная точка /me
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
+
 exports.getAllUsers = factory.getAll(User);
 exports.getUserId = factory.getOne(User);
 

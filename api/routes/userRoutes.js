@@ -8,6 +8,7 @@ const {
   deleteUserId,
   updateMe,
   deleteMe,
+  getMe,
 } = require('../controllers/userController');
 const {
   signup,
@@ -20,6 +21,7 @@ const {
 } = require('../controllers/authController');
 
 const router = express.Router();
+router.route('/me').get(protect, getMe, getUserId);
 
 router.post('/signup', signup);
 router.post('/login', loginAccountLimiter, login);
