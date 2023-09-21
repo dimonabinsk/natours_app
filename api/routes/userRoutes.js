@@ -18,10 +18,10 @@ const {
   protect,
   updatePassword,
   loginAccountLimiter,
+  restrictTo,
 } = require('../controllers/authController');
 
 const router = express.Router();
-router.route('/me').get(protect, getMe, getUserId);
 
 router.post('/signup', signup);
 router.post('/login', loginAccountLimiter, login);
@@ -29,9 +29,16 @@ router.post('/login', loginAccountLimiter, login);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 
-router.patch('/updatePassword', protect, updatePassword);
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
+// Защищаем все маршруты ниже, только авторизованные пользователи имеют к ним доступ
+router.use(protect);
+
+router.get('/me', getMe, getUserId);
+router.patch('/updatePassword', updatePassword);
+router.patch('/updateMe', updateMe);
+router.delete('/deleteMe', deleteMe);
+
+// Ниже доступно только администратору
+router.use(restrictTo('admin'));
 
 router.route('/').get(getAllUsers).post(createUser);
 router.route('/:id').get(getUserId).patch(updateUserId).delete(deleteUserId);
