@@ -71,14 +71,6 @@ userSchema.pre('save', function (next) {
   // то от времени отнимаем 1 секунду на всякий случай,
   // чтобы получать токен после смены пароля
   this.passwordChangedAt = Date.now() - 1000;
-
-  next();
-});
-
-userSchema.pre(/^find/, function (next) {
-  // перед любым запросом find** отображаем
-  //пользователей с активной учёной записью(не удалённой им)
-  this.find({ active: { $ne: false } });
   next();
 });
 
@@ -90,6 +82,13 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
   // Удаляем пароль в поле passwordConfirm
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // перед любым запросом find** отображаем
+  //пользователей с активной учёной записью(не удалённой им)
+  this.find({ active: { $ne: false } });
   next();
 });
 
