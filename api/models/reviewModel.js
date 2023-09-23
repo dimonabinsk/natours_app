@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 // const User = require('./userModel');
 const Tour = require('./tourModel');
+const AppError = require('../utils/appError');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -35,6 +36,8 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 reviewSchema.statics.calcAverageRating = async function (tourId) {
   const stats = await this.aggregate([
@@ -87,6 +90,9 @@ reviewSchema.post('save', function () {
 // findByIdAndDelete
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   this.reviewUpDoc = await this.model.findOne(this.getQuery());
+  if (!this.reviewUpDoc) {
+    return next(new AppError('Такой ID не найден', 400));
+  }
   // console.log(this.reviewUpDoc);
   next();
 });
