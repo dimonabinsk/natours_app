@@ -42,13 +42,15 @@ exports.updateOne = (Model) =>
       new: true,
       runValidators: true,
     });
-    if (!doc) return next(new AppError('Документ с таким ID не найден', 404));
+    if (!doc) next(new AppError('Документ с таким ID не найден', 404));
+
     res.json({
       status: 'success',
       data: {
         data: doc,
       },
     });
+    return doc;
   });
 
 exports.createOne = (Model) =>
