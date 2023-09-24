@@ -50,7 +50,6 @@ exports.updateOne = (Model) =>
         data: doc,
       },
     });
-    return doc;
   });
 
 exports.createOne = (Model) =>

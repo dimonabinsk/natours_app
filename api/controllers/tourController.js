@@ -1,7 +1,7 @@
 const Tour = require('../models/tourModel');
 // const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-// const AppError = require('../utils/appError');
+const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 // промежуточное по
@@ -153,6 +153,39 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     results: plan.length,
     data: {
       plan,
+    },
+  });
+});
+
+// '/tours-within/:distance/center/:coordinates/unit/:unit'
+// '/tours-within/200/center/33.946118,-118.188211/unit/mi'
+// определяем ближайшие к нам начало туров
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, coordinates, unit } = req.params;
+
+  const [lat, lng] = coordinates.split(',');
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Пожалуйста, укажите широту и долготу в формате "lat,lng" ',
+        400,
+      ),
+    );
+  }
+
+  console.log(distance, lat, lng, unit);
+
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      data: tours,
     },
   });
 });
