@@ -2,6 +2,14 @@ extends base
 
 include _reviewCard
 
+block append head
+  - const keyMapYandex = process.env.KEY_MAP_YANDEX
+  script(src=`https://api-maps.yandex.ru/2.1/?apikey=${keyMapYandex}&lang=ru_RU` defer)
+  script(src='/js/yandexMap.js' defer)
+
+
+
+
 mixin overviewBox(icon,label,text)
   div.overview-box__detail
     svg.overview-box__icon
@@ -65,7 +73,7 @@ block content
 
 
   section.section-map
-    #map
+    div#map(data-locations=`${JSON.stringify(tour.locations)}`)
 
   section.section-reviews
     div.reviews

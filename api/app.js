@@ -39,7 +39,47 @@ const apiLimiter = rateLimit({
 
 // Установите защищенные HTTP-заголовки
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'img-src': [
+          "'self'",
+          'data:',
+          'https://*.maps.yandex.net',
+          'api-maps.yandex.ru',
+          'https://yandex.ru',
+        ],
+        'frame-src': ['https://api-maps.yandex.ru'],
+        'child-src': [
+          "'self'",
+          'https://api-maps.yandex.ru',
+          'https://suggest-maps.yandex.ru',
+          'http://*.maps.yandex.net',
+          'https://yandex.ru',
+          'https://yastatic.net',
+        ],
+        'script-src': [
+          "'self'",
+          "'unsafe-eval'",
+          'https://api-maps.yandex.ru',
+          'https://suggest-maps.yandex.ru',
+          'https://*.maps.yandex.net',
+          'https://yandex.ru',
+          'https://yastatic.net',
+        ],
+        'connect-src': [
+          'https://api-maps.yandex.ru',
+          'https://suggest-maps.yandex.ru',
+          'https://*.maps.yandex.net',
+          'https://yandex.ru',
+          'https://*.taxi.yandex.net',
+        ],
+        // 'style-src': ["'blob:'", "'self'"],
+      },
+    },
+  }),
+);
 
 // Синтаксический анализатор тела, считывающий данные из тела в req.body
 app.use(
