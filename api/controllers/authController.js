@@ -106,6 +106,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -145,6 +147,33 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   // 5) Предоставить доступ к защищённому маршруту
   req.user = currentUser;
+  next();
+});
+
+// Проверка на то,что пользователь авторизован,только для отрендеренных страниц и если нет ошибок
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // 1) Проверить есть ли токен
+  if (req.cookies.jwt) {
+    // 2) Верифицировать токен
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+
+    // 3) Проверить, существует ли еще пользователь
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+    // 4) Проверить, сменил ли пользователь пароль после выдачи токена
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    // есть вошедший в систему пользователь
+    res.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 

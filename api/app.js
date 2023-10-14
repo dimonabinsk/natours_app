@@ -5,6 +5,7 @@ const { rateLimit } = require('express-rate-limit');
 const { default: helmet } = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -67,6 +68,7 @@ app.use(
           'https://*.maps.yandex.net',
           'https://yandex.ru',
           'https://yastatic.net',
+          'https://unpkg.com/axios/dist/axios.min.js',
         ],
         'connect-src': [
           'https://api-maps.yandex.ru',
@@ -74,6 +76,7 @@ app.use(
           'https://*.maps.yandex.net',
           'https://yandex.ru',
           'https://*.taxi.yandex.net',
+          'http://localhost:8080',
         ],
         // 'style-src': ["'blob:'", "'self'"],
       },
@@ -87,6 +90,8 @@ app.use(
     limit: '10kb',
   }),
 );
+
+app.use(cookieParser());
 
 // Очистка данных от внедрения запросов NoSQL
 app.use(mongoSanitize());
@@ -114,7 +119,7 @@ app.use('/api', apiLimiter);
 // тестовое промежуточное ПО (test middleware)
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
 app.use('/', viewRouter);
