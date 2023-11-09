@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const fs = require('fs');
 const dotenv = require('dotenv');
 
@@ -14,7 +15,7 @@ const users = JSON.parse(fs.readFileSync(`${__dirname}/data/users.json`));
 const reviews = JSON.parse(fs.readFileSync(`${__dirname}/data/reviews.json`));
 
 mongoose
-  .connect(process.env.DATABASE, {
+  .connect(process.env.DATABASE_LOCALHOST, {
     user: process.env.USERNAME,
     pass: process.env.PASSWORD,
     dbName: 'natours',
